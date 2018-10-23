@@ -26,7 +26,6 @@ setTimeout(function(){
 
 function dict_relevance_NN(str, obj, links){ // N no greater than 6
   var book=[''];
-  var Link_book=[''];
   var res =[''];
   var sample ='';
   var sample_entropy = 0;
@@ -45,12 +44,7 @@ function dict_relevance_NN(str, obj, links){ // N no greater than 6
     relevent_sentence+=alphabet_match(Train_NN((sample[i+1]-0x0061)/(0x007A-0x0061),(str[i+1]-0x0061)/(0x007A-0x0061),100, 0.02),str[i],global_count)  
   }
 
-
-  for (var i=0;i<links.length;i++){
-    Link_book.push(links[i].name); // use the beginning as the logic anchor
-  }
-
-  sample = Link_book[Math.floor(Math.random()*Link_book.length)];  
+  sample = links[Math.floor(Math.random()*links.length)];  
 
   for(i=0;i<6;i++){
     relevent_sentence=alphabet_match(Train_NN((sample[i+1]-0x0061)/(0x007A-0x0061),(relevent_sentence[i+1]-0x0061)/(0x007A-0x0061),100, 0.02),relevent_sentence[i],global_count)  
