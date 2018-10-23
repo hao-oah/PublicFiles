@@ -15,17 +15,25 @@ d3.csv("https://rawcdn.githack.com/hao-oah/PublicFiles/master/Abalone.csv", func
   data_dictionary = data;// d3 async nature.
 });
 
+
+var data_interlinks;
+d3.csv("https://rawcdn.githack.com/hao-oah/PublicFiles/master/interlinks.csv", function(data) {
+  data_interlinks = data;// d3 async nature.
+});
+
+
 setTimeout(function(){
 
-function dict_relevance_NN(str, obj){ // N no greater than 6
+function dict_relevance_NN(str, obj, links){ // N no greater than 6
   var book=[''];
+  var Link_book=[''];
   var res =[''];
   var sample ='';
   var sample_entropy = 0;
   var global_count =0;
   var relevent_sentence ='';
   for (var i=0;i<obj.length;i++){
-    if(obj[i].Abalone[0]==str[0]) obj.push(obj[i].Abalone); // use the beginning as the logic anchor
+    if(obj[i].Abalone[0]==str[0]) book.push(obj[i].Abalone); // use the beginning as the logic anchor
   }
   for (i=0;i<book.length;i++){
     for (var j=2;j<7;j++){if (book[i][j]==str[j]) res.push(book[i])} // use any point in the sentence as the second anchor
@@ -33,10 +41,20 @@ function dict_relevance_NN(str, obj){ // N no greater than 6
 
   sample = res[Math.floor(Math.random()*res.length)];  
 
-  for(i=0;i<7;i++){
-    relevent_sentence+=alphabet_match(Train_NN((sample[0]-0x0061)/(0x007A-0x0061),(str[0]-0x0061)/(0x007A-0x0061),100, 0.02),str[0],global_count)  
+  for(i=0;i<6;i++){
+    relevent_sentence+=alphabet_match(Train_NN((sample[i+1]-0x0061)/(0x007A-0x0061),(str[i+1]-0x0061)/(0x007A-0x0061),100, 0.02),str[i],global_count)  
   }
 
+
+  for (var i=0;i<links.length;i++){
+    Link_book.push(links[i].name); // use the beginning as the logic anchor
+  }
+
+  sample = Link_book[Math.floor(Math.random()*Link_book.length)];  
+
+  for(i=0;i<6;i++){
+    relevent_sentence=alphabet_match(Train_NN((sample[i+1]-0x0061)/(0x007A-0x0061),(relevent_sentence[i+1]-0x0061)/(0x007A-0x0061),100, 0.02),relevent_sentence[i],global_count)  
+  }
   return relevent_sentence[0]+' ' + relevent_sentence[1]+' ' + relevent_sentence[2]+' ' + relevent_sentence[3]+' ' + relevent_sentence[4]+' ' + relevent_sentence[5]+' ' + relevent_sentence[6];
 }
 /////// some simple text terms generated with random number and a 7 layer NN
@@ -79,7 +97,7 @@ if (typeof p !==null || typeof p !='undefined'){
   str_middle += past_alpha;
   past_alpha=alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate),past_alpha,global_count);
   str_middle += past_alpha;
-  str += ' ' + dict_relevance_NN(str_middle, data_dictionary) + ' ' +ending_add;
+  str += ' ' + dict_relevance_NN(str_middle, data_dictionary, data_interlinks) + ' ' +ending_add;
   var text = document.getElementById('text_field');
   text.value = str_middle;
 
