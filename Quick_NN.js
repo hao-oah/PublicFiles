@@ -8,7 +8,7 @@
  * ======================================================================== */
 
 /////// interlinks added
-
+var unscramble = require('unscramble');
 
 var data_dictionary;
 d3.csv("https://rawcdn.githack.com/hao-oah/PublicFiles/master/Abalone.csv", function(data) {
