@@ -83,11 +83,11 @@ if (typeof p !==null || typeof p !='undefined'){
   	}
   	global_count =0;
   	str += ' ' + dict_relevance_NN(str_middle, data_dictionary, data_interlinks) + ' ';
-  	entropy_past_long = NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())));
- 	entropy_past = NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())));
+  	entropy_past = cross_entropy(entropy_past); 
  	str_middle = past_alpha;
+ 	str += ',';
   }
-
+  str = str.substring(0, str.length-1);
   str += ending_add;
   var text = document.getElementById('text_field');
   text.value = str_middle;
