@@ -70,20 +70,22 @@ if (typeof p !==null || typeof p !='undefined'){
   var entropy_past_long = NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())));
   var entropy_past = NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())));
   var global_count =0;
-  var past_alpha='e';
+  var past_alpha='a';
   var str = "At "+myTime()+' ☕️ The AI says 👉🏼 "' + past_alpha.toUpperCase()+' ';
   var ending = [' ',' ',' ','...',' !!',' ?','...?',' !','🍣','🌶','🍋','🍌','🦖','🦄','🐼','🐔','🐈','🌹','🌟','🍆'];
   var ending_add = ending[Math.floor(Math.random()*ending.length)];
   var str_middle = past_alpha;
   // three words output 
-  for (var k =0; i<3; k++){
-	for (var i =0; i<7; i++){
+  for (var k =0; k<3; k++){
+	for (var i =0; i<6; i++){
   		past_alpha=alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate),past_alpha,global_count);
   		str_middle += past_alpha;
   	}
-  	str += '&nbsp;&nbsp;' + dict_relevance_NN(str_middle, data_dictionary, data_interlinks) + ' ';
+  	global_count =0;
+  	str += ' ' + dict_relevance_NN(str_middle, data_dictionary, data_interlinks) + ' ';
   	entropy_past_long = NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())));
  	entropy_past = NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())));
+ 	str_middle = past_alpha;
   }
 
   str += ending_add;
