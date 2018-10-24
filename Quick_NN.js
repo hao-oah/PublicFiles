@@ -37,10 +37,10 @@ function dict_relevance_NN(str, obj, links, N){ // N is a seq flag which determi
   sample = book[Math.floor(Math.random()*book.length)];  
 
   for(i=0;i<7;i++){
-    relevent_sentence+=alphabet_match(Train_NN((sample[i]-0x0061)/(0x007A-0x0061),(str[i]-0x0061)/(0x007A-0x0061),100, 0.02),str[i],global_count)  
+    relevent_sentence+=alphabet_match(Train_NN((sample[i]-0x0061)/(0x007A-0x0061),(str[i]-0x0061)/(0x007A-0x0061),100, 0.01),str[i],global_count)  
   }
 
-  sample = links[Math.floor(Math.random()*links.length)];  // this can be set more deterministic using ff on larger dataset
+  sample = links[Math.floor(Math.random()*links.length)];  // dataset load
 
   for(i=7*(N-1);i<7*N;i++){
     linked_sentence+=alphabet_match(Train_NN((sample[i]-0x0061)/(0x007A-0x0061),(relevent_sentence[i]-0x0061)/(0x007A-0x0061),4, 0.01),relevent_sentence[i],global_count)  // lower for now to avoid overfitting
@@ -70,7 +70,8 @@ if (typeof p !==null || typeof p !='undefined'){
   var entropy_past_long = NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())));
   var entropy_past = NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())));
   var global_count =0;
-  var past_alpha='z';
+  var Freq_word = Math.random()>0.4?'etaonrishd':Math.random()>0.3?'lfcmu':'gypwb'; // same initializer for the first char
+  var past_alpha= Freq_word[Math.floor(Math.random()*Freq_word.leng;
   var str = "At "+myTime()+' ☕️ The AI says 👉🏼 "' + past_alpha.toUpperCase()+' ';
   var ending = [' ',' ',' ','...',' !!',' ?','...?',' !','🍣','🌶','🍋','🍌','🦖','🦄','🐼','🐔','🐈','🌹','🌟','🍆'];
   var ending_add = ending[Math.floor(Math.random()*ending.length)];
