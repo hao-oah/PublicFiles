@@ -75,6 +75,7 @@ if (typeof p !==null || typeof p !='undefined'){
   var ending = [' ',' ',' ','...',' !!',' ?','...?',' !','🍣','🌶','🍋','🍌','🦖','🦄','🐼','🐔','🐈','🌹','🌟','🍆'];
   var ending_add = ending[Math.floor(Math.random()*ending.length)];
   var str_middle = past_alpha;
+  // three words output 
   for (var k =0; i<3; k++){
 	for (var i =0; i<7; i++){
   		past_alpha=alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate),past_alpha,global_count);
