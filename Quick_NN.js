@@ -36,14 +36,14 @@ function dict_relevance_NN(str, obj, links){ // N no greater than 6
   }
   sample = book[Math.floor(Math.random()*book.length)];  
 
-  for(i=0;i<6;i++){
-    relevent_sentence+=alphabet_match(Train_NN((sample[i+1]-0x0061)/(0x007A-0x0061),(str[i+1]-0x0061)/(0x007A-0x0061),100, 0.02),str[i],global_count)  
+  for(i=0;i<7;i++){
+    relevent_sentence+=alphabet_match(Train_NN((sample[i]-0x0061)/(0x007A-0x0061),(str[i]-0x0061)/(0x007A-0x0061),100, 0.02),str[i],global_count)  
   }
 
   sample = links[Math.floor(Math.random()*links.length)];  
 
-  for(i=0;i<6;i++){
-    linked_sentence+=alphabet_match(Train_NN((sample[i+1]-0x0061)/(0x007A-0x0061),(relevent_sentence[i+1]-0x0061)/(0x007A-0x0061),100, 0.02),relevent_sentence[i],global_count)  
+  for(i=0;i<7;i++){
+    linked_sentence+=alphabet_match(Train_NN((sample[i]-0x0061)/(0x007A-0x0061),(relevent_sentence[i]-0x0061)/(0x007A-0x0061),100, 0.02),relevent_sentence[i],global_count)  
   }
   return linked_sentence[0]+' ' + linked_sentence[1]+' ' + linked_sentence[2]+' ' + linked_sentence[3]+' ' + linked_sentence[4]+' ' + linked_sentence[5]+' ' + linked_sentence[6];
 }
