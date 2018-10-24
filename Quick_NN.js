@@ -45,6 +45,9 @@ function dict_relevance_NN(str, obj, links, N){ // N is a seq flag which determi
   for(i=7*(N-1);i<7*N;i++){
     linked_sentence+=alphabet_match(Train_NN((sample[i]-0x0061)/(0x007A-0x0061),(relevent_sentence[i]-0x0061)/(0x007A-0x0061),4, 0.01),relevent_sentence[i],global_count)  // lower for now to avoid overfitting
   }
+  if (unscramble(linked_sentence)[0] != 'No results found.')
+  	linked_sentence = unscramble(linked_sentence)[Math.floor(Math.random()*unscramble(linked_sentence).length)];
+
   return linked_sentence[0]+' ' + linked_sentence[1]+' ' + linked_sentence[2]+' ' + linked_sentence[3]+' ' + linked_sentence[4]+' ' + linked_sentence[5]+' ' + linked_sentence[6];
 }
 /////// some simple text terms generated with random number and a 7 layer NN
