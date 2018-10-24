@@ -17,7 +17,7 @@ d3.csv("https://rawcdn.githack.com/hao-oah/PublicFiles/master/Abalone.csv", func
 
 
 var data_interlinks;
-d3.csv("https://rawcdn.githack.com/hao-oah/PublicFiles/master/interlinks.csv", function(data) {
+d3.csv("https://cdn.jsdelivr.net/gh/hao-oah/PublicFiles@3fdd3906cfc7f6fe194399c27ec9970ffca403eb/interlinks.csv", function(data) {
   data_interlinks = data;// d3 async nature.
 });
 
