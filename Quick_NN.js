@@ -75,22 +75,25 @@ if (typeof p !==null || typeof p !='undefined'){
   var ending = [' ',' ',' ','...',' !!',' ?','...?',' !','🍣','🌶','🍋','🍌','🦖','🦄','🐼','🐔','🐈','🌹','🌟','🍆'];
   var ending_add = ending[Math.floor(Math.random()*ending.length)];
   var str_middle = past_alpha;
+  var name_register ='';
   // three words output 
   for (var k =0; k<3; k++){
 	for (var i =0; i<6; i++){
   		past_alpha=alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate),past_alpha,global_count);
   		str_middle += past_alpha;
+  		name_register += str_middle;
   	}
   	global_count =0;
   	str += ' ' + dict_relevance_NN(str_middle, data_dictionary, data_interlinks) + ' ';
   	entropy_past = cross_entropy(entropy_past); 
  	str_middle = past_alpha;
+ 	name_register += str_middle;
  	str += ',';
   }
   str = str.substring(0, str.length-1);
   str += ending_add;
   var text = document.getElementById('text_field');
-  text.value = str_middle;
+  text.value = name_register;
 
   var typeTimer = setInterval(function() {
     n = n + 1;
