@@ -8,7 +8,11 @@
  * ======================================================================== */
 
 /////// interlinks added
-var unscramble = require('unscramble');
+define(['unscramble'],function(unscramble){require(unscramble,function(){
+	for (var i = 0; i < arguments.length; i++){
+		var unscramble = arguments[i];
+	}
+});});
 
 
 var data_dictionary;
