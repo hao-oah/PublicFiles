@@ -24,7 +24,7 @@ d3.csv("https://cdn.jsdelivr.net/gh/hao-oah/PublicFiles@3fdd3906cfc7f6fe194399c2
 
 setTimeout(function(){
 
-function dict_relevance_NN(str, obj, links){ // N no greater than 6
+function dict_relevance_NN(str, obj, links, N){ // N is a seq flag which determines which section it runs.
   var book=[''];
   var sample ='';
   var sample_entropy = 0;
@@ -40,10 +40,10 @@ function dict_relevance_NN(str, obj, links){ // N no greater than 6
     relevent_sentence+=alphabet_match(Train_NN((sample[i]-0x0061)/(0x007A-0x0061),(str[i]-0x0061)/(0x007A-0x0061),100, 0.02),str[i],global_count)  
   }
 
-  sample = links[Math.floor(Math.random()*links.length)];  
+  sample = links[Math.floor(Math.random()*links.length)];  // this can be set more deterministic using ff on larger dataset
 
-  for(i=0;i<7;i++){
-    linked_sentence+=alphabet_match(Train_NN((sample[i]-0x0061)/(0x007A-0x0061),(relevent_sentence[i]-0x0061)/(0x007A-0x0061),100, 0.02),relevent_sentence[i],global_count)  
+  for(i=7*(N-1);i<7*N;i++){
+    linked_sentence+=alphabet_match(Train_NN((sample[i]-0x0061)/(0x007A-0x0061),(relevent_sentence[i]-0x0061)/(0x007A-0x0061),10, 0.01),relevent_sentence[i],global_count)  // lower for now to avoid overfitting
   }
   return linked_sentence[0]+' ' + linked_sentence[1]+' ' + linked_sentence[2]+' ' + linked_sentence[3]+' ' + linked_sentence[4]+' ' + linked_sentence[5]+' ' + linked_sentence[6];
 }
@@ -70,7 +70,7 @@ if (typeof p !==null || typeof p !='undefined'){
   var entropy_past_long = NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())));
   var entropy_past = NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())));
   var global_count =0;
-  var past_alpha='a';
+  var past_alpha='z';
   var str = "At "+myTime()+' ☕️ The AI says 👉🏼 "' + past_alpha.toUpperCase()+' ';
   var ending = [' ',' ',' ','...',' !!',' ?','...?',' !','🍣','🌶','🍋','🍌','🦖','🦄','🐼','🐔','🐈','🌹','🌟','🍆'];
   var ending_add = ending[Math.floor(Math.random()*ending.length)];
@@ -84,8 +84,8 @@ if (typeof p !==null || typeof p !='undefined'){
   		name_register += str_middle;
   	}
   	global_count =0;
-  	str += ' ' + dict_relevance_NN(str_middle, data_dictionary, data_interlinks) + ' ';
-  	entropy_past = cross_entropy(entropy_past); 
+  	str += ' ' + dict_relevance_NN(str_middle, dentropy_pastata_dictionary, data_interlinks, k+1) + ' ';
+  	entropy_past = 0.3*(Math.random()>0.5?entropy_past:NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())))) + 0.7*entropy_past; // what remembered might not be the actual.
  	str_middle = past_alpha;
  	name_register += str_middle;
  	str += ',';
@@ -197,7 +197,7 @@ function softplus(value){
 }
 
 function alphabet_match(value,past_char,count){
-  var Freq_word = Math.random()>0.3?'etaoinshrdlcum':'wfgypb';
+  var Freq_word = Math.random()>0.4?'etaonrishd':Math.random()>0.3?'lfcmu':'gypwb';
   var Frea_combo = 'thareions';
   var Frea_combo_re = 'oihearntdsf';
   var Frea_double = 'lesotrnp';
