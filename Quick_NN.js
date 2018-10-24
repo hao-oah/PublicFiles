@@ -8,12 +8,6 @@
  * ======================================================================== */
 
 /////// interlinks added
-define(['unscramble'],function(unscramble){require(unscramble,function(){
-	for (var i = 0; i < arguments.length; i++){
-		var unscramble = arguments[i];
-	}
-});});
-
 
 var data_dictionary;
 d3.csv("https://rawcdn.githack.com/hao-oah/PublicFiles/master/Abalone.csv", function(data) {
