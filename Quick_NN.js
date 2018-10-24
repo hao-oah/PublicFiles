@@ -75,7 +75,7 @@ if (typeof p !==null || typeof p !='undefined'){
   var ending = [' ',' ',' ','...',' !!',' ?','...?',' !','🍣','🌶','🍋','🍌','🦖','🦄','🐼','🐔','🐈','🌹','🌟','🍆'];
   var ending_add = ending[Math.floor(Math.random()*ending.length)];
   var str_middle = past_alpha;
-  var name_register ='';
+  var name_register = str_middle;
   // three words output 
   for (var k =0; k<3; k++){
 	for (var i =0; i<6; i++){
