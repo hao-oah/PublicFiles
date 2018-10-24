@@ -70,7 +70,7 @@ if (typeof p !==null || typeof p !='undefined'){
   var entropy_past_long = NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())));
   var entropy_past = NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())));
   var global_count =0;
-  var Freq_word = Math.random()>0.4?'etaonrishd':Math.random()>0.3?'lfcmu':'gypwb'; // same initializer for the first char
+  var Freq_word = Math.random()>0.4?'etaonrishd':(Math.random()>0.3?'lfcmu':'gypwb'); // same initializer for the first char
   var past_alpha= Freq_word[Math.floor(Math.random()*Freq_word.leng)];
   var str = "At "+myTime()+' ☕️ The AI says 👉🏼 "' + past_alpha.toUpperCase()+' ';
   var ending = [' ',' ',' ','...',' !!',' ?','...?',' !','🍣','🌶','🍋','🍌','🦖','🦄','🐼','🐔','🐈','🌹','🌟','🍆'];
@@ -198,7 +198,7 @@ function softplus(value){
 }
 
 function alphabet_match(value,past_char,count){
-  var Freq_word = Math.random()>0.4?'etaonrishd':Math.random()>0.3?'lfcmu':'gypwb';
+  var Freq_word = Math.random()>0.4?'etaonrishd':(Math.random()>0.3?'lfcmu':'gypwb');
   var Frea_combo = 'thareions';
   var Frea_combo_re = 'oihearntdsf';
   var Frea_double = 'lesotrnp';
