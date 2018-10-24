@@ -70,24 +70,22 @@ if (typeof p !==null || typeof p !='undefined'){
   var entropy_past_long = NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())));
   var entropy_past = NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())));
   var global_count =0;
-  var past_alpha=alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate),'a',global_count);
+  var past_alpha='e';
   var str = "At "+myTime()+' ☕️ The AI says 👉🏼 "' + past_alpha.toUpperCase()+' ';
   var ending = [' ',' ',' ','...',' !!',' ?','...?',' !','🍣','🌶','🍋','🍌','🦖','🦄','🐼','🐔','🐈','🌹','🌟','🍆'];
   var ending_add = ending[Math.floor(Math.random()*ending.length)];
   var str_middle = past_alpha;
-  past_alpha=alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate),past_alpha,global_count);
-  str_middle += past_alpha;
-  past_alpha=alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate),past_alpha,global_count);
-  str_middle += past_alpha;
-  past_alpha=alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate),past_alpha,global_count);
-  str_middle += past_alpha;
-  past_alpha=alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate),past_alpha,global_count);
-  str_middle += past_alpha;
-  past_alpha=alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate),past_alpha,global_count);
-  str_middle += past_alpha;
-  past_alpha=alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate),past_alpha,global_count);
-  str_middle += past_alpha;
-  str += ' ' + dict_relevance_NN(str_middle, data_dictionary, data_interlinks) + ' ' +ending_add;
+  for (var k =0; i<3; k++){
+	for (var i =0; i<7; i++){
+  		past_alpha=alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate),past_alpha,global_count);
+  		str_middle += past_alpha;
+  	}
+  	str += '&nbsp;&nbsp;' + dict_relevance_NN(str_middle, data_dictionary, data_interlinks) + ' ';
+  	entropy_past_long = NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())));
+ 	entropy_past = NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())));
+  }
+
+  str += ending_add;
   var text = document.getElementById('text_field');
   text.value = str_middle;
 
@@ -193,7 +191,7 @@ function softplus(value){
 }
 
 function alphabet_match(value,past_char,count){
-  var Freq_word = Math.random()>0.5?'etaonrish':'eariotns';
+  var Freq_word = Math.random()>0.3?'etaoinshrdlcum':'wfgypb';
   var Frea_combo = 'thareions';
   var Frea_combo_re = 'oihearntdsf';
   var Frea_double = 'lesotrnp';
