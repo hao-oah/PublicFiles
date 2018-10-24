@@ -70,9 +70,10 @@ if (typeof p !==null || typeof p !='undefined'){
   var entropy_past_long = NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())));
   var entropy_past = NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())));
   var global_count =0;
-  var Freq_word = Math.random()>0.4?'etaonrishd':(Math.random()>0.3?'lfcmu':'gypwb'); // same initializer for the first char
-  var past_alpha= Freq_word[Math.floor(Math.random()*Freq_word.leng)];
-  var str = "At "+myTime()+' ☕️ The AI says 👉🏼 "' + past_alpha.toUpperCase()+' ';
+  var Freq_ = Math.random()>0.4?'etaonrishd':'lfcmugypwb'; // same initializer for the first char
+  var past_alpha= Freq_[Math.floor(Math.random()*Freq_.length)];
+  past_alpha = alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate),past_alpha,global_count);
+  var str = "At "+myTime()+' ☕️ The AI says 👉🏼 "' + past_alpha.toUpperCase() + ' ';
   var ending = [' ',' ',' ','...',' !!',' ?','...?',' !','🍣','🌶','🍋','🍌','🦖','🦄','🐼','🐔','🐈','🌹','🌟','🍆'];
   var ending_add = ending[Math.floor(Math.random()*ending.length)];
   var str_middle = past_alpha;
