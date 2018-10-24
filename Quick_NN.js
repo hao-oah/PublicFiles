@@ -84,7 +84,7 @@ if (typeof p !==null || typeof p !='undefined'){
   		name_register += str_middle;
   	}
   	global_count =0;
-  	str += ' ' + dict_relevance_NN(str_middle, dentropy_pastata_dictionary, data_interlinks, k+1) + ' ';
+  	str += ' ' + dict_relevance_NN(str_middle, data_dictionary, data_interlinks, k+1) + ' ';
   	entropy_past = 0.3*(Math.random()>0.5?entropy_past:NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())))) + 0.7*entropy_past; // what remembered might not be the actual.
  	str_middle = past_alpha;
  	name_register += str_middle;
