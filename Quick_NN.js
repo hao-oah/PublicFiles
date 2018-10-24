@@ -17,7 +17,7 @@ d3.csv("https://rawcdn.githack.com/hao-oah/PublicFiles/master/Abalone.csv", func
 
 
 var data_interlinks;
-d3.csv("https://cdn.jsdelivr.net/gh/hao-oah/PublicFiles@3fdd3906cfc7f6fe194399c27ec9970ffca403eb/interlinks.csv", function(data) {
+d3.csv("https://cdn.jsdelivr.net/gh/hao-oah/PublicFiles@12854f6f0a9deede2bd9da97d2cdef916d2ba37b/interlinks.csv", function(data) {
   data_interlinks = data;// d3 async nature.
 });
 
@@ -43,7 +43,7 @@ function dict_relevance_NN(str, obj, links, N){ // N is a seq flag which determi
   sample = links[Math.floor(Math.random()*links.length)];  // this can be set more deterministic using ff on larger dataset
 
   for(i=7*(N-1);i<7*N;i++){
-    linked_sentence+=alphabet_match(Train_NN((sample[i]-0x0061)/(0x007A-0x0061),(relevent_sentence[i]-0x0061)/(0x007A-0x0061),10, 0.01),relevent_sentence[i],global_count)  // lower for now to avoid overfitting
+    linked_sentence+=alphabet_match(Train_NN((sample[i]-0x0061)/(0x007A-0x0061),(relevent_sentence[i]-0x0061)/(0x007A-0x0061),4, 0.01),relevent_sentence[i],global_count)  // lower for now to avoid overfitting
   }
   return linked_sentence[0]+' ' + linked_sentence[1]+' ' + linked_sentence[2]+' ' + linked_sentence[3]+' ' + linked_sentence[4]+' ' + linked_sentence[5]+' ' + linked_sentence[6];
 }
