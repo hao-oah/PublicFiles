@@ -30,6 +30,7 @@ function dict_relevance_NN(str, obj, links){ // N no greater than 6
   var sample_entropy = 0;
   var global_count =0;
   var relevent_sentence ='';
+  var linked_sentence ='';
   for (var i=0;i<obj.length;i++){
     if(obj[i].Abalone[0]==str[0]) book.push(obj[i].Abalone); // use the beginning as the logic anchor
   }
@@ -42,9 +43,9 @@ function dict_relevance_NN(str, obj, links){ // N no greater than 6
   sample = links[Math.floor(Math.random()*links.length)];  
 
   for(i=0;i<6;i++){
-    relevent_sentence=alphabet_match(Train_NN((sample[i+1]-0x0061)/(0x007A-0x0061),(relevent_sentence[i+1]-0x0061)/(0x007A-0x0061),100, 0.02),relevent_sentence[i],global_count)  
+    linked_sentence+=alphabet_match(Train_NN((sample[i+1]-0x0061)/(0x007A-0x0061),(relevent_sentence[i+1]-0x0061)/(0x007A-0x0061),100, 0.02),relevent_sentence[i],global_count)  
   }
-  return relevent_sentence[0]+' ' + relevent_sentence[1]+' ' + relevent_sentence[2]+' ' + relevent_sentence[3]+' ' + relevent_sentence[4]+' ' + relevent_sentence[5]+' ' + relevent_sentence[6];
+  return linked_sentence[0]+' ' + linked_sentence[1]+' ' + linked_sentence[2]+' ' + linked_sentence[3]+' ' + linked_sentence[4]+' ' + linked_sentence[5]+' ' + linked_sentence[6];
 }
 /////// some simple text terms generated with random number and a 7 layer NN
 ///
