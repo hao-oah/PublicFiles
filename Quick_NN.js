@@ -9,6 +9,9 @@
  * 1044504787@qq.com
  * ======================================================================== */
 
+
+
+setTimeout(function(){
 ///////
 var locationreload = document.getElementById('locationreload'); // change this objecthandling view reload.
 
@@ -44,6 +47,7 @@ d3.json("https://cdn.rawgit.com/hao-oah/PublicFiles/master/common_words.json", f
 });
   // section flag
   p.innerHTML = 'S y n t h e s i z i n g . . . (1/2)🚦';
+
 
 
 function dict_relevance_NN(str, obj, links, N, N_layers, Temperature){ // N is a seq flag which determines which section it runs.
@@ -355,6 +359,8 @@ function indexOfMax(array) {
   return maxIndex;
 }
 
+
+
 function unscramble(word,words_atlas){
 
   word = word.toLowerCase();
@@ -418,3 +424,7 @@ String.prototype.levenstein = function(string) {
 
 }
 }
+
+
+
+},1600);
