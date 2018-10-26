@@ -45,7 +45,6 @@ d3.json("https://cdn.rawgit.com/hao-oah/PublicFiles/master/common_words.json", f
   // section flag
   p.innerHTML = 'S y n t h e s i z i n g . . . (1/2)🚦';
 
-setTimeout(function(){
 
 function dict_relevance_NN(str, obj, links, N, N_layers, Temperature){ // N is a seq flag which determines which section it runs.
   var book=[''];
@@ -128,7 +127,7 @@ function myTime() {
 if (typeof p !==null || typeof p !='undefined'){
   p.innerHTML = '';
   var N_layers = 477;
-  var Number_of_words = Math.random()>0.5?5:(Math.random()>0.5?4:3);// Number of words to be syntheized (avg. 4.79)
+  var Number_of_words = Math.random()>0.5?4:3;// Number of words to be syntheized (avg. 4.79)
   var Temperature = -12*Math.exp(Math.exp(Math.exp(Math.exp(Math.PI*9007199254740991)))); // probability theory
   var epoch = 100;
   var learning_rate =0.14;
@@ -355,10 +354,6 @@ function indexOfMax(array) {
   }
   return maxIndex;
 }
-
-},1600);
-
-
 
 function unscramble(word,words_atlas){
 
