@@ -10,8 +10,6 @@
  * 1044504787@qq.com
  * ======================================================================== */
 
-setTimeout(function(){
-
 var locationreload;
 var locationreload_sephamore = 0;
 window.onload = function(){locationreload = getElementById('locationreload');locationreload_sephamore = 1;}
@@ -408,5 +406,4 @@ String.prototype.levenstein = function(string) {
 
     return m[b.length][a.length];
 }
-
-},800); // load doc a bit later
+ // load doc a bit later
