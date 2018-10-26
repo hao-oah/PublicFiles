@@ -9,9 +9,6 @@
 //////////////////////////////////////////////////////////////////////
 
 
-if (document.getElementsByClassName("canvas-overlay") != null){
-
-
 // Time_scale
 var Time_scale = 0
 
@@ -176,5 +173,3 @@ function visibilitySetup() {
 }
 
 visibilitySetup();
-
-}
