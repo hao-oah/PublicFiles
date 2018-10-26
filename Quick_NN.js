@@ -12,7 +12,10 @@
 
 setTimeout(function(){
 
-var locationreload = getElementById('locationreload');
+var locationreloa;
+
+window.onload = funtion () {
+  locationreload = getElementById('locationreload');
 
 
 var words_atlas = ['this','collection','of','words','is','a','simple','one','but','its',
@@ -408,5 +411,5 @@ String.prototype.levenstein = function(string) {
 }
 
 
-
+}
 },800); // load doc a bit later
