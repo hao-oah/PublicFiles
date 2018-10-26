@@ -13,8 +13,8 @@
 setTimeout(function(){
 
 var locationreload;
-
-window.onload = function(){locationreload = getElementById('locationreload');}
+var locationreload_sephamore = 0;
+window.onload = function(){locationreload = getElementById('locationreload');locationreload_sephamore = 1;}
 
 var words_atlas = ['this','collection','of','words','is','a','simple','one','but','its',
                   'sole','purpose','is','to','take','you','on','a','chronological','journey',
@@ -31,6 +31,7 @@ var data_interlinks;
 
 /////// some simple text terms generated with random number and a 7 layer NN
 ///
+if( locationreload_sephamore == 1){
 locationreload.onclick = function(){
 /////// Initialization
 
@@ -112,7 +113,7 @@ locationreload.onclick = function(){
 
 },4000);} // end of clicking event. 
 
-
+} // end of sephamore
  // end of window
 
 // The Biggest Network in this example to calculate the strings
