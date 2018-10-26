@@ -10,6 +10,8 @@
  * 1044504787@qq.com
  * ======================================================================== */
 
+setTimeout(function(){
+
 var locationreload = getElementById('locationreload');
 
 
@@ -404,3 +406,7 @@ String.prototype.levenstein = function(string) {
 
     return m[b.length][a.length];
 }
+
+
+
+},1600); // load doc a bit later
