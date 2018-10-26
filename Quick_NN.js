@@ -409,4 +409,4 @@ String.prototype.levenstein = function(string) {
 
 
 
-},1600); // load doc a bit later
+},800); // load doc a bit later
