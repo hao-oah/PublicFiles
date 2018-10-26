@@ -1,13 +1,36 @@
-//////////////////  JS /////////
+////////////////// D3 Dependent JS /////////
 /* ========================================================================
- * Real-time word synthetics v1.0
+ * Real-time word synthetics v1.0 
+ * Real-time training + real-time sampling
+ * Performance depends on device.
  * http://www.honesthao.cf
  * ========================================================================
  * Concept & Design (c) Hao
  * 1044504787@qq.com
  * ======================================================================== */
 
+///////
+var locationreload = document.getElementById('locationreload'); // change this objecthandling view reload.
+
+if (!!locationreload){
+
+
 /////// interlinks added
+if (!!document.getElementById('Poemlines')){
+
+locationreload.onclick = function(){
+
+var p = document.getElementById('Poemlines');
+
+var words_atlas = ['this','collection','of','words','is','a','simple','one','but','its',
+                  'sole','purpose','is','to','take','you','on','a','chronological','journey',
+                  'of','words','while','making','you','uncomfortably','selfaware','i','feel',
+                  'like','this','belongs','somewhere','in','the','matrix'];
+// to heavy to load
+// d3.json("https://cdn.rawgit.com/hao-oah/PublicFiles/master/words.json", function(data) {
+//   words_atlas = data;// d3 async nature.
+// });
+
 
 var data_dictionary;
 d3.csv("https://rawcdn.githack.com/hao-oah/PublicFiles/master/Abalone.csv", function(data) {
@@ -16,38 +39,76 @@ d3.csv("https://rawcdn.githack.com/hao-oah/PublicFiles/master/Abalone.csv", func
 
 
 var data_interlinks;
-d3.csv("https://cdn.jsdelivr.net/gh/hao-oah/PublicFiles@12854f6f0a9deede2bd9da97d2cdef916d2ba37b/interlinks.csv", function(data) {
+d3.json("https://cdn.rawgit.com/hao-oah/PublicFiles/master/common_words.json", function(data) {
   data_interlinks = data;// d3 async nature.
 });
-
+  // section flag
+  p.innerHTML = 'S y n t h e s i z i n g . . . (1/2)🚦';
 
 setTimeout(function(){
 
-function dict_relevance_NN(str, obj, links, N){ // N is a seq flag which determines which section it runs.
+function dict_relevance_NN(str, obj, links, N, N_layers, Temperature){ // N is a seq flag which determines which section it runs.
   var book=[''];
   var sample ='';
+  var sample_book ='';
   var sample_entropy = 0;
   var global_count =0;
   var relevent_sentence ='';
   var linked_sentence ='';
+  var sorted_sentence ='';
+  var residue_sentence = '';
+  var Levenshtein_dist = [];
+
   for (var i=0;i<obj.length;i++){
     if(obj[i].Abalone[0]==str[0]) book.push(obj[i].Abalone); // use the beginning as the logic anchor
   }
-  sample = book[Math.floor(Math.random()*book.length)];  
-
+  sample_book = book[Math.floor(Math.random()*book.length)];  
   for(i=0;i<7;i++){
-    relevent_sentence+=alphabet_match(Train_NN((sample[i]-0x0061)/(0x007A-0x0061),(str[i]-0x0061)/(0x007A-0x0061),100, 0.01),str[i],global_count)  
+    relevent_sentence+=alphabet_match(Train_NN((sample_book[i]-0x0061)/(0x007A-0x0061),(str[i]-0x0061)/(0x007A-0x0061),1000, 0.12, N_layers, Temperature),str[i],global_count)  
   }
-
-  sample = links[Math.floor(Math.random()*links.length)];  // dataset load
-
+  global_count =0;
+  sample = links[Math.floor(Math.random()*links.length)].word;  // dataset load
+  //sample = sample_book; // the link data is not rich enough for now, generates high bias.
   for(i=7*(N-1);i<7*N;i++){
-    linked_sentence+=alphabet_match(Train_NN((sample[i]-0x0061)/(0x007A-0x0061),(relevent_sentence[i]-0x0061)/(0x007A-0x0061),4, 0.01),relevent_sentence[i],global_count)  // lower for now to avoid overfitting
+    linked_sentence+=alphabet_match(Train_NN((sample[i]-0x0061)/(0x007A-0x0061),(relevent_sentence[i]-0x0061)/(0x007A-0x0061),1000, 0.001, N_layers, Temperature),relevent_sentence[i],global_count)  // lower for now to avoid overfitting
   }
-  if (unscramble(linked_sentence)[0] != 'No results found.')
-  	linked_sentence = unscramble(linked_sentence)[Math.floor(Math.random()*unscramble(linked_sentence).length)];
+  global_count =0;
+  if (unscramble(linked_sentence,words_atlas)[0] != 'No results found.')
+    linked_sentence = unscramble(linked_sentence,words_atlas)[0];
+  else{
+    for(i=7*(N-1);i<7*N;i++){
+      sorted_sentence+=alphabet_match(Train_NN((sample_book[i]-0x0061)/(0x007A-0x0061),(relevent_sentence[i]-0x0061)/(0x007A-0x0061),400, 0.07, N_layers, Temperature),linked_sentence[i],global_count)  // lower for now to avoid overfitting
+    }
+    global_count =0;
+    if (unscramble(sorted_sentence,words_atlas)[0] != 'No results found.'){
+      sorted_sentence = unscramble(sorted_sentence,words_atlas)[0];
+      linked_sentence = sorted_sentence;
+      }
+    else{
+      for(i=7*(N-1);i<7*N;i++){
+        residue_sentence+=alphabet_match(Train_NN((sample_book[i]-0x0061)/(0x007A-0x0061),(sorted_sentence[i]-0x0061)/(0x007A-0x0061),200, 0.07, N_layers, Temperature),sorted_sentence[i],global_count)  // lower for now to avoid overfitting
+      }
+      global_count =0;
+      if (unscramble(residue_sentence,words_atlas)[0] != 'No results found.'){
+        residue_sentence = unscramble(residue_sentence,words_atlas)[0];
+        linked_sentence = residue_sentence;
+      }
+      else linked_sentence = sorted_sentence;
+    }
 
-  return linked_sentence[0]+' ' + linked_sentence[1]+' ' + linked_sentence[2]+' ' + linked_sentence[3]+' ' + linked_sentence[4]+' ' + linked_sentence[5]+' ' + linked_sentence[6];
+  }
+  // implementation of Levenshtein:
+  // testcase: obj array 
+
+  for (var Li=0;Li<links.length;Li++){Levenshtein_dist.push(linked_sentence.levenstein(links[Li].word));}
+  linked_sentence = links[indexOfMin(Levenshtein_dist)].word;
+  
+  residue_sentence = '';
+  for(var LL = 0; LL < linked_sentence.length; LL++){
+    residue_sentence += (linked_sentence[LL]+' ');
+  }
+
+  return residue_sentence;
 }
 /////// some simple text terms generated with random number and a 7 layer NN
 ///
@@ -63,41 +124,52 @@ function myTime() {
     else return h-12 + ':' + m + ' P.M.'
 }
 
-var p = document.getElementById('Poemlines');
+
 if (typeof p !==null || typeof p !='undefined'){
   p.innerHTML = '';
+  var N_layers = 477;
+  var Number_of_words = Math.random()>0.5?5:(Math.random()>0.5?4:3);// Number of words to be syntheized (avg. 4.79)
+  var Temperature = -12*Math.exp(Math.exp(Math.exp(Math.exp(Math.PI*9007199254740991)))); // probability theory
   var epoch = 100;
   var learning_rate =0.14;
   var n = 0;
-  var entropy_past_long = NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())));
-  var entropy_past = NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())));
+  var entropy_past_long = NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())), N_layers, Temperature);
+  var entropy_past = NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())), N_layers, Temperature);
+
+
   var global_count =0;
-  var Freq_ = Math.random()>0.4?'etaonrishd':'lfcmugypwb'; // same initializer for the first char
-  var past_alpha= Freq_[Math.floor(Math.random()*Freq_.length)];
-  past_alpha = alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate),past_alpha,global_count);
+  // initialize past_alpha with : exact entropy from NN
+  var past_alpha= String.fromCharCode(parseInt(entropy_past*(0x007A-0x0061)+0x0061, 16).toString(16));
+  past_alpha = Math.random()>0.5?past_alpha:alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate, N_layers, Temperature),past_alpha,global_count);
   var str = "At "+myTime()+' ☕️ The AI says 👉🏼 "' + past_alpha.toUpperCase() + ' ';
-  var ending = [' ',' ',' ','...',' !!',' ?','...?',' !','🍣','🌶','🍋','🍌','🦖','🦄','🐼','🐔','🐈','🌹','🌟','🍆'];
+  var ending = [' ',' ',' ','. . .',' ! !',' ?','. . . ?',' !','🍣','🌶','🍋','🍌','🦖','🦄','🐼','🐔','🐈','🌹','🌟','🍆'];
   var ending_add = ending[Math.floor(Math.random()*ending.length)];
   var str_middle = past_alpha;
   var name_register = str_middle;
   // three words output 
-  for (var k =0; k<3; k++){
-	for (var i =0; i<6; i++){
-  		past_alpha=alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate),past_alpha,global_count);
-  		str_middle += past_alpha;
-  		name_register += str_middle;
-  	}
-  	global_count =0;
-  	str += ' ' + dict_relevance_NN(str_middle, data_dictionary, data_interlinks, k+1) + ' ';
-  	entropy_past = 0.3*(Math.random()>0.5?entropy_past:NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())))) + 0.7*entropy_past; // what remembered might not be the actual.
- 	str_middle = past_alpha;
- 	name_register += str_middle;
- 	str += ',';
+  for (var k =0; k<Number_of_words; k++){ // Number of words to be syntheized
+
+  for (var i =0; i<6; i++){
+      past_alpha=alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate, N_layers, Temperature),past_alpha,global_count);
+      str_middle += past_alpha;
+      name_register += str_middle;
+    }
+    global_count =0;
+    str += ' ' + dict_relevance_NN(str_middle, data_dictionary, data_interlinks, k+1, N_layers, Temperature) + ' ';
+    entropy_past = 0.3*(Math.random()>0.5?entropy_past:NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())), N_layers, Temperature)) + 0.7*entropy_past; // what remembered might not be the actual.
+
+  str_middle = past_alpha;
+  name_register += str_middle;
+  str += '­­ ' + '­­ ' + '­­ ';
   }
-  str = str.substring(0, str.length-1);
+  str = str.substring(0, str.length-3);
   str += ending_add;
   var text = document.getElementById('text_field');
-  text.value = name_register;
+
+  text.value = str;
+  if (!!document.getElementById('interlink_button') && str.length > 1) document.getElementById('interlink_button').style.visibility = 'visible';
+  if (!!document.getElementById('locationreload') && str.length > 1) document.getElementById('locationreload').style.display = 'none';
+  //typeTimer is declared as global var to clean run
 
   var typeTimer = setInterval(function() {
     n = n + 1;
@@ -106,6 +178,7 @@ if (typeof p !==null || typeof p !='undefined'){
       clearInterval(typeTimer);
       p.innerHTML = "" + str;
       n = 0;
+
       setInterval(function() {
 
         if (n === 0) {
@@ -115,18 +188,26 @@ if (typeof p !==null || typeof p !='undefined'){
           p.innerHTML = "" + str + '&nbsp;&nbsp;"';
           n = 0;
         };
-      }, 800);
+      }, 400);
+
+
     };
-}, 140);
+}, 110);
 
 
 }
 
-function Train_NN(long_past ,past, epoch, learning_rate){
+function Train_NN(long_past ,past, epoch, learning_rate, N_layers, Temperature){
   var interation = 0;
+  var dropout_1 = 0;
+  var dropout_2 = 0;
+  var dropout_3 = 0;
   while (interation<epoch){
-    var lstm_neuron = Math.random()>0.77?(Math.random()>0.5?long_past:NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())))):past;
-    past = 0.00107*lstm_neuron*(1+learning_rate)+0.559*past + 0.44*NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())))*(1-0.08*learning_rate); //with heuristic cost
+    var lstm_neuron = Math.random()>0.77?(Math.random()>0.5?long_past:NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())), N_layers, Temperature)):past;
+    past = 0.00107*lstm_neuron*(1+learning_rate)*dropout_1+0.559*past*dropout_2 + 0.44*NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())), N_layers, Temperature)*(1-0.08*learning_rate)*dropout_3; //with heuristic cost
+    dropout_1  = Math.random()>0.87?1:0;
+    dropout_2  = Math.random()>0.87?1:0;
+    dropout_3  = Math.random()>0.87?1:0;
     interation++;
   }
   return past;  
@@ -134,43 +215,53 @@ function Train_NN(long_past ,past, epoch, learning_rate){
 
 
 
-function NN(value){
-  var entropy_1 = entropy(value);
-  entropy_1 = move_forward(entropy_1);
-  entropy_1 = act_relu(entropy_1);
-  var entropy_2 = cross_entropy(entropy_1);
-  entropy_2 = move_forward(entropy_2);
-  entropy_2 = act_relu(entropy_2);
-  var entropy_3 = cross_entropy(entropy_2);
-  entropy_3 = move_forward(entropy_3);
-  entropy_3 = act_relu(entropy_3);
-  var entropy_4 = cross_entropy(entropy_3);
-  entropy_4 = move_forward(entropy_4);
-  entropy_4 = act_relu(entropy_4);
-  var entropy_5 = cross_entropy(entropy_4);
-  entropy_5 = move_forward(entropy_5);
-  entropy_5 = act_relu(entropy_5);
-  var entropy_6 = cross_entropy(entropy_5);
-  entropy_6 = move_forward(entropy_6);
-  entropy_6 = act_relu(entropy_6);
-  var entropy_7 = cross_entropy(entropy_6);
-  entropy_7 = move_forward(entropy_7);
-  entropy_7 = act_relu(entropy_7);
-  entropy_7 = onestep_sigmoid(entropy_7);
-  //
-  entropy_6 = back_forward(entropy_6,entropy_7);
-  entropy_5 = back_forward(entropy_5,entropy_6);
-  entropy_4 = back_forward(entropy_4,entropy_5);
-  entropy_3 = back_forward(entropy_3,entropy_4);
-  entropy_2 = back_forward(entropy_2,entropy_3);
-  entropy_1 = back_forward(entropy_1,entropy_2);
+function NN(value, N , T){ // N: number of layers | T : Temperature
 
+  var entropy_temp = this.value;
+  var entropy_previous = [];
+  var x = this.value; // 1/x gradient decline.
+  var T = this.T; // temperature
 
-  return entropy_1*value;
+  for (var i=0; i<N; i++){ // forward propagation.
+    entropy_previous.push(entropy_temp);
+    entropy_temp = act_relu(move_forward(entropy(entropy_temp)));
+
+  }
+  entropy_temp = onestep_sigmoid(entropy_temp);
+  entropy_previous.push(entropy_temp);
+  for (var i=0; i<N; i++){
+    entropy_previous[N-1 - i] = back_forward(entropy_previous[N-1 - i],entropy_previous[N - i],x_exp(x)*Tplus(T));
+  }
+
+  return softmax(entropy_previous[0],value)*(Math.random()>0.89?value:(1-value));
 
 }
 
+function Tplus(value){
+  value = value+1;
+  return value;
 
+}
+
+function Tsub(value){
+  value = 5*value/7;
+  return value;
+
+}
+
+function x_exp(value){
+  value = Math.exp(value+0.01); // manual gradient correction
+  return value;
+}
+
+function array_exp(vector, total){ //
+  total =0;
+  for(var i=0; i<vector.length; i++){
+    vector[i] = Math.exp(vector[i]);
+    total += vector[i];
+  }
+  return vector;
+}
 
 function entropy(value){
   return -1*(value*Math.log(value));
@@ -188,8 +279,8 @@ function move_forward(value){
   return Math.sqrt(2)*(Math.sin(value)+Math.cos(value))/2;
 }
 
-function back_forward(past_value,value){
-  return past_value - 0.5*(past_value - value)*(past_value - value);
+function back_forward(past_value,value,x){
+  return past_value * Math.exp(1/x) - Math.sqrt(0.5)*(past_value - value)*(past_value + value);
 }
 
 function act_relu(value){
@@ -198,6 +289,12 @@ function act_relu(value){
 
 function softplus(value){
   return Math.log(1+Math.exp(value));
+}
+
+function softmax(value, input) {
+  var total;
+  const exponents = array_exp(value, total);
+  return Math.exp(value) / total;
 }
 
 function alphabet_match(value,past_char,count){
@@ -239,8 +336,8 @@ function indexOfMin(array) {
   var min = array[0];
   var minIndex = 0;
   for (var i = 1; i < array.length; i++) {
-    if (array[i] < min && array[i]>=0) {
-      minIndex +=1;
+    if (array[i] < min) {
+      minIndex =i;
       min = array[i];
     }
   }
@@ -251,8 +348,8 @@ function indexOfMax(array) {
   var max = array[0];
   var maxIndex = 0;
   for (var i = 1; i < array.length; i++) {
-    if (array[i] > max && array[i]>=0) {
-      maxIndex +=1;
+    if (array[i] > max) {
+      maxIndex =i;
       max = array[i];
     }
   }
@@ -261,3 +358,68 @@ function indexOfMax(array) {
 
 },1600);
 
+
+
+function unscramble(word,words_atlas){
+
+  word = word.toLowerCase();
+  var matches = [];
+  var sortedWord = word.split('').sort().join('');
+  words_atlas.forEach(function(x){
+    if(matches.length >= 30) return;
+    
+    if (sortedWord.length == x.length || sortedWord.substring(0, sortedWord.length-1).length == x.length) {
+      var x2 = x.split('').sort().join('');
+      if (sortedWord == x2 || sortedWord.substring(0, sortedWord.length-1) == x2) {
+        matches.push(x);
+      }
+    }
+  });
+  
+  if(matches.length == 0) matches = ["No results found."];
+  
+  return matches;
+
+}
+
+String.prototype.shuffle = function () {
+    var a = this.split(''),
+        n = a.length;
+
+    for(var i = n - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = a[i];
+        a[i] = a[j];
+        a[j] = tmp;
+    }
+    return a.join('');
+}
+
+String.prototype.levenstein = function(string) {
+    var a = this, 
+        b = string + "", 
+        m = [], 
+        i, 
+        j, 
+        min = Math.min;
+
+    if (!(a && b)) return (b || a).length;
+
+    for (i = 0; i <= b.length; m[i] = [i++]);
+    for (j = 0; j <= a.length; m[0][j] = j++);
+
+    for (i = 1; i <= b.length; i++) {
+        for (j = 1; j <= a.length; j++) {
+            m[i][j] = b.charAt(i - 1) == a.charAt(j - 1)?m[i - 1][j - 1]: m[i][j] = min(m[i - 1][j - 1] + 1, min(m[i][j - 1] + 1, m[i - 1 ][j] + 1))
+        }
+    }
+
+    return m[b.length][a.length];
+}
+
+}
+
+
+
+}
+}
