@@ -1,54 +1,118 @@
-////////////////// D3 Dependent JS /////////
+
+
+////////////////// D3 JS /////////
 /* ========================================================================
- * Real-time word synthetics v1.0 
- * Real-time training + real-time sampling
- * Performance depends on device.
+ * Real-time word synthetics v1.0
+ * Performance Depends on device.
  * http://www.honesthao.cf
  * ========================================================================
  * Concept & Design (c) Hao
  * 1044504787@qq.com
  * ======================================================================== */
 
+var locationreload = getElementById('locationreload');
 
-
-setTimeout(function(){
-///////
-var locationreload = document.getElementById('locationreload'); // change this objecthandling view reload.
-
-if (!!locationreload){
-
-
-/////// interlinks added
-if (!!document.getElementById('Poemlines')){
-
-locationreload.onclick = function(){
-
-var p = document.getElementById('Poemlines');
 
 var words_atlas = ['this','collection','of','words','is','a','simple','one','but','its',
                   'sole','purpose','is','to','take','you','on','a','chronological','journey',
                   'of','words','while','making','you','uncomfortably','selfaware','i','feel',
                   'like','this','belongs','somewhere','in','the','matrix'];
-// to heavy to load
-// d3.json("https://cdn.rawgit.com/hao-oah/PublicFiles/master/words.json", function(data) {
-//   words_atlas = data;// d3 async nature.
-// });
-
-
 var data_dictionary;
-d3.csv("https://rawcdn.githack.com/hao-oah/PublicFiles/master/Abalone.csv", function(data) {
-  data_dictionary = data;// d3 async nature.
-});
-
-
+  d3.csv("https://rawcdn.githack.com/hao-oah/PublicFiles/master/Abalone.csv", function(data) {
+    data_dictionary = data;// d3 async nature.
+  });
 var data_interlinks;
-d3.json("https://cdn.rawgit.com/hao-oah/PublicFiles/master/common_words.json", function(data) {
-  data_interlinks = data;// d3 async nature.
-});
+  d3.json("https://cdn.rawgit.com/hao-oah/PublicFiles/master/common_words.json", function(data) {
+    data_interlinks = data;// d3 async nature.
+  });
+
+/////// some simple text terms generated with random number and a 7 layer NN
+///
+locationreload.onclick = function(){
+/////// Initialization
+
+  var p = document.getElementById('Poemlines');
   // section flag
+
   p.innerHTML = 'S y n t h e s i z i n g . . . (1/2)🚦';
 
+  setTimeout(function(){
 
+    if (typeof p !==null || typeof p !='undefined'){
+    p.innerHTML = '';
+    var N_layers = 477;
+    var Number_of_words = Math.random()>0.5?5:(Math.random()>0.5?4:3);// Number of words to be syntheized (avg. 4.79)
+    var Temperature = -12*Math.exp(Math.exp(Math.exp(Math.exp(Math.PI*9007199254740991)))); // probability theory
+    var epoch = 100;
+    var learning_rate =0.14;
+    var n = 0;
+    var entropy_past_long = NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())), N_layers, Temperature);
+    var entropy_past = NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())), N_layers, Temperature);
+    var global_count =0;
+    var text = document.getElementById('text_field'); // hold text transfer
+
+    // initialize past_alpha with : exact entropy from NN
+
+    var past_alpha= String.fromCharCode(parseInt(entropy_past*(0x007A-0x0061)+0x0061, 16).toString(16));
+    past_alpha = Math.random()>0.5?past_alpha:alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate, N_layers, Temperature),past_alpha,global_count);
+    var str = "At "+myTime()+' ☕️ The AI says 👉🏼 "' + past_alpha.toUpperCase() + ' ';
+    var ending = [' ',' ',' ','. . .',' ! !',' ?','. . . ?',' !','🍣','🌶','🍋','🍌','🦖','🦄','🐼','🐔','🐈','🌹','🌟','🍆'];
+    var ending_add = ending[Math.floor(Math.random()*ending.length)];
+    var str_middle = past_alpha;
+    var name_register = str_middle;
+    // three words output 
+    for (var k =0; k<Number_of_words; k++){ // Number of words to be syntheized
+
+      for (var i =0; i<6; i++){
+        past_alpha=alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate, N_layers, Temperature),past_alpha,global_count);
+        str_middle += past_alpha;
+        name_register += str_middle;
+      }
+      global_count =0;
+      str += ' ' + dict_relevance_NN(str_middle, data_dictionary, data_interlinks, k+1, N_layers, Temperature) + ' ';
+      entropy_past = 0.3*(Math.random()>0.5?entropy_past:NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())), N_layers, Temperature)) + 0.7*entropy_past; // what remembered might not be the actual.
+
+      str_middle = past_alpha;
+      name_register += str_middle;
+      str += '­­ ' + '­­ ' + '­­ ';
+    }
+    str = str.substring(0, str.length-3);
+    str += ending_add;
+
+    text.value = str; // text is the holder of the input transfer in front
+    if (!!document.getElementById('interlink_button') && str.length > 1) document.getElementById('interlink_button').style.visibility = 'visible';
+    if (!!document.getElementById('locationreload') && str.length > 1) document.getElementById('locationreload').style.display = 'none';
+    //typeTimer is declared as global var to clean run
+
+    var typeTimer = setInterval(function() {
+      n = n + 1;
+      p.innerHTML = "" + str.slice(0, n);
+      if (n === str.length) {
+        clearInterval(typeTimer);
+        p.innerHTML = "" + str;
+        n = 0;
+
+        setInterval(function() {
+
+          if (n === 0) {
+            p.innerHTML = "" + str + '_"';
+            n = 1;
+          } else {
+            p.innerHTML = "" + str + '&nbsp;&nbsp;"';
+            n = 0;
+          };
+        }, 400);
+      };
+    }, 110);
+  } // end of the sampling program./ 
+
+
+},4000);} // end of clicking event. 
+
+
+ // end of window
+
+// The Biggest Network in this example to calculate the strings
 
 function dict_relevance_NN(str, obj, links, N, N_layers, Temperature){ // N is a seq flag which determines which section it runs.
   var book=[''];
@@ -113,91 +177,42 @@ function dict_relevance_NN(str, obj, links, N, N_layers, Temperature){ // N is a
 
   return residue_sentence;
 }
-/////// some simple text terms generated with random number and a 7 layer NN
-///
 
+// medium sized network of this example to handle simple corrections. 
 
-
-
-function myTime() {
-    var d = new Date();
-    var h = d.getHours();
-    var m = d.getMinutes();
-    if (h<=12) return h + ':' + m + ' A.M.'
-    else return h-12 + ':' + m + ' P.M.'
-}
-
-
-if (typeof p !==null || typeof p !='undefined'){
-  p.innerHTML = '';
-  var N_layers = 477;
-  var Number_of_words = Math.random()>0.5?4:3;// Number of words to be syntheized (avg. 4.79)
-  var Temperature = -12*Math.exp(Math.exp(Math.exp(Math.exp(Math.PI*9007199254740991)))); // probability theory
-  var epoch = 100;
-  var learning_rate =0.14;
-  var n = 0;
-  var entropy_past_long = NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())), N_layers, Temperature);
-  var entropy_past = NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())), N_layers, Temperature);
-
-
-  var global_count =0;
-  // initialize past_alpha with : exact entropy from NN
-  var past_alpha= String.fromCharCode(parseInt(entropy_past*(0x007A-0x0061)+0x0061, 16).toString(16));
-  past_alpha = Math.random()>0.5?past_alpha:alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate, N_layers, Temperature),past_alpha,global_count);
-  var str = "At "+myTime()+' ☕️ The AI says 👉🏼 "' + past_alpha.toUpperCase() + ' ';
-  var ending = [' ',' ',' ','. . .',' ! !',' ?','. . . ?',' !','🍣','🌶','🍋','🍌','🦖','🦄','🐼','🐔','🐈','🌹','🌟','🍆'];
-  var ending_add = ending[Math.floor(Math.random()*ending.length)];
-  var str_middle = past_alpha;
-  var name_register = str_middle;
-  // three words output 
-  for (var k =0; k<Number_of_words; k++){ // Number of words to be syntheized
-
-  for (var i =0; i<6; i++){
-      past_alpha=alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate, N_layers, Temperature),past_alpha,global_count);
-      str_middle += past_alpha;
-      name_register += str_middle;
+function alphabet_match(value,past_char,count){
+  var Freq_word = Math.random()>0.4?'etaonrishd':(Math.random()>0.3?'lfcmu':'gypwb');
+  var Frea_combo = 'thareions';
+  var Frea_combo_re = 'oihearntdsf';
+  var Frea_double = 'lesotrnp';
+  var item_1 = 'e';
+  var item_2 = 'e';
+  if (count < 1){
+  
+    if (Frea_combo.indexOf(past_char) > -1){
+      var item_1 = Frea_combo_re[Math.floor(Math.random()*Frea_combo_re.length)];
     }
-    global_count =0;
-    str += ' ' + dict_relevance_NN(str_middle, data_dictionary, data_interlinks, k+1, N_layers, Temperature) + ' ';
-    entropy_past = 0.3*(Math.random()>0.5?entropy_past:NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())), N_layers, Temperature)) + 0.7*entropy_past; // what remembered might not be the actual.
-
-  str_middle = past_alpha;
-  name_register += str_middle;
-  str += '­­ ' + '­­ ' + '­­ ';
+    if (Frea_double.indexOf(past_char) > -1){
+      var item_2 = past_char;
+    }
+    else {
+      var item_1 = Freq_word[Math.floor(Math.random()*Freq_word.length)];
+      var item_2 = Freq_word[Math.floor(Math.random()*Freq_word.length)];
+    }
+    var temp_var = Math.random()>0.5?String.fromCharCode(parseInt(value*(0x007A-0x0061)+0x0061, 16).toString(16)):(Math.random()>0.5?item_1:item_2);
+    if (temp_var==past_char) count++; 
+    return temp_var; 
   }
-  str = str.substring(0, str.length-3);
-  str += ending_add;
-  var text = document.getElementById('text_field');
-
-  text.value = str;
-  if (!!document.getElementById('interlink_button') && str.length > 1) document.getElementById('interlink_button').style.visibility = 'visible';
-  if (!!document.getElementById('locationreload') && str.length > 1) document.getElementById('locationreload').style.display = 'none';
-  //typeTimer is declared as global var to clean run
-
-  var typeTimer = setInterval(function() {
-    n = n + 1;
-    p.innerHTML = "" + str.slice(0, n);
-    if (n === str.length) {
-      clearInterval(typeTimer);
-      p.innerHTML = "" + str;
-      n = 0;
-
-      setInterval(function() {
-
-        if (n === 0) {
-          p.innerHTML = "" + str + '_"';
-          n = 1;
-        } else {
-          p.innerHTML = "" + str + '&nbsp;&nbsp;"';
-          n = 0;
-        };
-      }, 400);
-
-
-    };
-}, 110);
-
-
+  else if (count>=1){
+    var temp_var = Math.random()>0.5?String.fromCharCode(parseInt(value*(0x007A-0x0061)+0x0061, 16).toString(16)):(Math.random()>0.5?item_1:item_2);
+    while(temp_var==past_char){
+      temp_var = Freq_word[Math.floor(Math.random()*Freq_word.length)]; // act as a correction
+    }
+    //count = 0;
+    return temp_var;
+  }
+  else
+    return '&nbsp;';
 }
 
 function Train_NN(long_past ,past, epoch, learning_rate, N_layers, Temperature){
@@ -215,7 +230,6 @@ function Train_NN(long_past ,past, epoch, learning_rate, N_layers, Temperature){
   }
   return past;  
 }
-
 
 
 function NN(value, N , T){ // N: number of layers | T : Temperature
@@ -239,6 +253,16 @@ function NN(value, N , T){ // N: number of layers | T : Temperature
   return softmax(entropy_previous[0],value)*(Math.random()>0.89?value:(1-value));
 
 }
+
+
+function myTime() {
+    var d = new Date();
+    var h = d.getHours();
+    var m = d.getMinutes();
+    if (h<=12) return h + ':' + m + ' A.M.'
+    else return h-12 + ':' + m + ' P.M.'
+}
+
 
 function Tplus(value){
   value = value+1;
@@ -300,41 +324,6 @@ function softmax(value, input) {
   return Math.exp(value) / total;
 }
 
-function alphabet_match(value,past_char,count){
-  var Freq_word = Math.random()>0.4?'etaonrishd':(Math.random()>0.3?'lfcmu':'gypwb');
-  var Frea_combo = 'thareions';
-  var Frea_combo_re = 'oihearntdsf';
-  var Frea_double = 'lesotrnp';
-  var item_1 = 'e';
-  var item_2 = 'e';
-  if (count < 1){
-  
-    if (Frea_combo.indexOf(past_char) > -1){
-      var item_1 = Frea_combo_re[Math.floor(Math.random()*Frea_combo_re.length)];
-    }
-    if (Frea_double.indexOf(past_char) > -1){
-      var item_2 = past_char;
-    }
-    else {
-      var item_1 = Freq_word[Math.floor(Math.random()*Freq_word.length)];
-      var item_2 = Freq_word[Math.floor(Math.random()*Freq_word.length)];
-    }
-    var temp_var = Math.random()>0.5?String.fromCharCode(parseInt(value*(0x007A-0x0061)+0x0061, 16).toString(16)):(Math.random()>0.5?item_1:item_2);
-    if (temp_var==past_char) count++; 
-    return temp_var; 
-  }
-  else if (count>=1){
-    var temp_var = Math.random()>0.5?String.fromCharCode(parseInt(value*(0x007A-0x0061)+0x0061, 16).toString(16)):(Math.random()>0.5?item_1:item_2);
-    while(temp_var==past_char){
-      temp_var = Freq_word[Math.floor(Math.random()*Freq_word.length)]; // act as a correction
-    }
-    //count = 0;
-    return temp_var;
-  }
-  else
-    return '&nbsp;';
-}
-
 function indexOfMin(array) {
   var min = array[0];
   var minIndex = 0;
@@ -358,8 +347,6 @@ function indexOfMax(array) {
   }
   return maxIndex;
 }
-
-
 
 function unscramble(word,words_atlas){
 
@@ -417,14 +404,3 @@ String.prototype.levenstein = function(string) {
 
     return m[b.length][a.length];
 }
-
-}
-
-
-
-}
-}
-
-
-
-},1600);
