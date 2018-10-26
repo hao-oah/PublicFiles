@@ -12,11 +12,9 @@
 
 setTimeout(function(){
 
-var locationreloa;
+var locationreload;
 
-window.onload = funtion () {
-  locationreload = getElementById('locationreload');
-}
+window.onload = function(){locationreload = getElementById('locationreload');}
 
 var words_atlas = ['this','collection','of','words','is','a','simple','one','but','its',
                   'sole','purpose','is','to','take','you','on','a','chronological','journey',
