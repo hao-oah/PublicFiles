@@ -16,7 +16,7 @@ var locationreloa;
 
 window.onload = funtion () {
   locationreload = getElementById('locationreload');
-
+}
 
 var words_atlas = ['this','collection','of','words','is','a','simple','one','but','its',
                   'sole','purpose','is','to','take','you','on','a','chronological','journey',
@@ -410,6 +410,4 @@ String.prototype.levenstein = function(string) {
     return m[b.length][a.length];
 }
 
-
-}
 },800); // load doc a bit later
