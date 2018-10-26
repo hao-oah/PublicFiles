@@ -8,7 +8,7 @@
 //                                                                  //
 //////////////////////////////////////////////////////////////////////
 
-
+setTimeout(function(){
 // Time_scale
 var Time_scale = 0
 
@@ -173,3 +173,5 @@ function visibilitySetup() {
 }
 
 visibilitySetup();
+
+},1600);
