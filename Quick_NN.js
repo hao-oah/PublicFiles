@@ -12,7 +12,12 @@
 
 var locationreload;
 var locationreload_sephamore = 0;
-window.onload = function(){locationreload = getElementById('locationreload');locationreload_sephamore = 1;}
+window.onload = function(){
+  setInterval(function(){
+    locationreload = getElementById('locationreload');
+    locationreload_sephamore = 1;
+  },1400);
+};
 
 var words_atlas = ['this','collection','of','words','is','a','simple','one','but','its',
                   'sole','purpose','is','to','take','you','on','a','chronological','journey',
