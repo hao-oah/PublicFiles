@@ -1,6 +1,3 @@
-
-
-////////////////// D3 JS /////////
 /* ========================================================================
  * Real-time word synthetics v1.0
  * Performance Depends on device.
@@ -9,13 +6,6 @@
  * Concept & Design (c) Hao
  * 1044504787@qq.com
  * ======================================================================== */
-
-var locationreload_sephamore = 0;
-
-window.onload = function(){
-    var locationreload = getElementById('locationreload');
-    locationreload_sephamore = 1;
-};
 
 var words_atlas = ['this','collection','of','words','is','a','simple','one','but','its',
                   'sole','purpose','is','to','take','you','on','a','chronological','journey',
@@ -30,37 +20,84 @@ var data_interlinks;
     data_interlinks = data;// d3 async nature.
   });
 
-/////// some simple text terms generated with random number and a 7 layer NN
-///
+var locationreload_sephamore = 0;
+
+if (!!document.getElementById('locationreload')){
+    var interlink_button = document.getElementById('interlink_button');
+    var locationreload = document.getElementById('locationreload');
+    locationreload_sephamore = 1;
+};
+
+
 if( locationreload_sephamore == 1){
-locationreload.onclick = function(){
-/////// Initialization
+  locationreload.onclick = function(){
 
-  var p = document.getElementById('Poemlines');
-  // section flag
+    var str_play;
+    var poem = document.getElementById('Poemlines');
+    /////// FLAG ///////
+    poem.innerHTML = 'S y n t h e s i z i n g . . . (1/2)🚦';
 
-  p.innerHTML = 'S y n t h e s i z i n g . . . (1/2)🚦';
+    var str_temp;
+    setTimeout(function(){
+    var n = 0;
+    // ? mechanic procress 
+    str_play = str_temp = word_synthetics(poem);
 
-  setTimeout(function(){
+    addFields(1,str_temp);  
+    // text is the holder of the input transfer in front
+    if (!!document.getElementById('interlink_button') && str_play.length > 1)
+      document.getElementById('interlink_button').style.visibility = 'visible';
+    if (!!document.getElementById('locationreload') && str_play.length > 1)
+      document.getElementById('locationreload').style.display = 'none';
 
-    if (typeof p !==null || typeof p !='undefined'){
+    //typeTimer is declared as global var to clean run
+    var typeTimer = setInterval(function() {
+      n = n + 1;
+      poem.innerHTML = "" + str_play.slice(0, n);
+      if (n === str_play.length) {
+        clearInterval(typeTimer);
+        poem.innerHTML = "" + str_play;
+        n = 0;
+
+        setInterval(function() {
+
+          if (n === 0) {
+            poem.innerHTML = "" + str_play + '_"';
+            n = 1;
+          } else {
+            poem.innerHTML = "" + str_play + '&nbsp;&nbsp;"';
+            n = 0;
+          };
+        }, 400);
+      };
+    }, 110);
+    },4000);} // end of clicking event. 
+}
+
+
+// *This use case of the NN
+
+
+function word_synthetics(p){
+
+  if (typeof p !==null || typeof p !='undefined'){
+
+    // parameters
     p.innerHTML = '';
-    var N_layers = 477;
-    var Number_of_words = Math.random()>0.5?5:(Math.random()>0.5?4:3);// Number of words to be syntheized (avg. 4.79)
-    var Temperature = -12*Math.exp(Math.exp(Math.exp(Math.exp(Math.PI*9007199254740991)))); // probability theory
+    var N_layers = 1147;
+    var Number_of_words = Math.random()>0.874?4:(Math.random()>0.2?3:5);// Number of words to be syntheized (avg. 4.79)
+    var Temperature = -12*Math.exp(Math.exp(Math.exp(Math.exp(Math.PI*Math.pow(9007199254740991,4))))); // probability theory
     var epoch = 100;
     var learning_rate =0.14;
-    var n = 0;
-    var entropy_past_long = NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())), N_layers, Temperature);
-    var entropy_past = NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())), N_layers, Temperature);
+    var entropy_past_long = NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())), N_layers, Temperature<<Temperature);
+    var entropy_past = NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())), N_layers, Temperature<<Temperature);
     var global_count =0;
-    var text = document.getElementById('text_field'); // hold text transfer
 
     // initialize past_alpha with : exact entropy from NN
-
     var past_alpha= String.fromCharCode(parseInt(entropy_past*(0x007A-0x0061)+0x0061, 16).toString(16));
-    past_alpha = Math.random()>0.5?past_alpha:alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate, N_layers, Temperature),past_alpha,global_count);
-    var str = "At "+myTime()+' ☕️ The AI says 👉🏼 "' + past_alpha.toUpperCase() + ' ';
+        past_alpha = Math.random()>0.5?past_alpha:alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate, N_layers, Temperature<<Temperature),past_alpha,global_count);
+    //console.log('The past_alpha : ' + past_alpha);
+    var str = "At "+myTime()+' ☕️ The AI says 👉🏼 "' + ' ';
     var ending = [' ',' ',' ','. . .',' ! !',' ?','. . . ?',' !','🍣','🌶','🍋','🍌','🦖','🦄','🐼','🐔','🐈','🌹','🌟','🍆'];
     var ending_add = ending[Math.floor(Math.random()*ending.length)];
     var str_middle = past_alpha;
@@ -69,13 +106,13 @@ locationreload.onclick = function(){
     for (var k =0; k<Number_of_words; k++){ // Number of words to be syntheized
 
       for (var i =0; i<6; i++){
-        past_alpha=alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate, N_layers, Temperature),past_alpha,global_count);
+        past_alpha=alphabet_match(Train_NN(entropy_past_long,entropy_past,epoch, learning_rate, N_layers, Temperature<<Temperature),past_alpha,global_count);
         str_middle += past_alpha;
         name_register += str_middle;
       }
       global_count =0;
-      str += ' ' + dict_relevance_NN(str_middle, data_dictionary, data_interlinks, k+1, N_layers, Temperature) + ' ';
-      entropy_past = 0.3*(Math.random()>0.5?entropy_past:NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())), N_layers, Temperature)) + 0.7*entropy_past; // what remembered might not be the actual.
+      str += ' ' + dict_relevance_NN(str_middle, data_dictionary, data_interlinks, k+1, N_layers, Temperature<<Temperature) + ' ';
+      entropy_past = 0.3*(Math.random()>0.5?entropy_past:NN(Math.random()*onestep_sigmoid(Math.cos(Date.now())), N_layers, Temperature<<Temperature)) + 0.7*entropy_past; // what remembered might not be the actual.
 
       str_middle = past_alpha;
       name_register += str_middle;
@@ -83,41 +120,14 @@ locationreload.onclick = function(){
     }
     str = str.substring(0, str.length-3);
     str += ending_add;
+    return str
+  }
+  else return 'ERROR RUNNING USE CASE';
+}
 
-    text.value = str; // text is the holder of the input transfer in front
-    if (!!document.getElementById('interlink_button') && str.length > 1) document.getElementById('interlink_button').style.visibility = 'visible';
-    if (!!document.getElementById('locationreload') && str.length > 1) document.getElementById('locationreload').style.display = 'none';
-    //typeTimer is declared as global var to clean run
-
-    var typeTimer = setInterval(function() {
-      n = n + 1;
-      p.innerHTML = "" + str.slice(0, n);
-      if (n === str.length) {
-        clearInterval(typeTimer);
-        p.innerHTML = "" + str;
-        n = 0;
-
-        setInterval(function() {
-
-          if (n === 0) {
-            p.innerHTML = "" + str + '_"';
-            n = 1;
-          } else {
-            p.innerHTML = "" + str + '&nbsp;&nbsp;"';
-            n = 0;
-          };
-        }, 400);
-      };
-    }, 110);
-  } // end of the sampling program./ 
-
-
-},4000);} // end of clicking event. 
-
-} // end of sephamore
- // end of window
 
 // The Biggest Network in this example to calculate the strings
+
 
 function dict_relevance_NN(str, obj, links, N, N_layers, Temperature){ // N is a seq flag which determines which section it runs.
   var book=[''];
@@ -130,26 +140,39 @@ function dict_relevance_NN(str, obj, links, N, N_layers, Temperature){ // N is a
   var sorted_sentence ='';
   var residue_sentence = '';
   var Levenshtein_dist = [];
+  // 1 : The words with 7 letters => Learn how to construct a word 
+  // 2 : The common words         => Learn how to construct common phrase grammar
+  // 3 : The words with 7 letters => Re-Learn how to construct a word 
+  // 4 : The words with 7 letters => Re-Learn how to construct a word 
+  var epoch_1 = 1000;
+  var epoch_2 = 1000;
+  var epoch_3 = 400;
+  var epoch_4 = 200;
+  //
+  var learning_rate_1 = 0.12;
+  var learning_rate_2 = 0.0007; // not-prefered learning too much of this set
+  var learning_rate_3 = 0.07;
+  var learning_rate_4 = 0.07;
 
   for (var i=0;i<obj.length;i++){
     if(obj[i].Abalone[0]==str[0]) book.push(obj[i].Abalone); // use the beginning as the logic anchor
   }
   sample_book = book[Math.floor(Math.random()*book.length)];  
   for(i=0;i<7;i++){
-    relevent_sentence+=alphabet_match(Train_NN((sample_book[i]-0x0061)/(0x007A-0x0061),(str[i]-0x0061)/(0x007A-0x0061),1000, 0.12, N_layers, Temperature),str[i],global_count)  
+    relevent_sentence+=alphabet_match(Train_NN((sample_book[i]-0x0061)/(0x007A-0x0061),(str[i]-0x0061)/(0x007A-0x0061),epoch_1, learning_rate_1, N_layers, Temperature<<Temperature),str[i],global_count)  
   }
   global_count =0;
   sample = links[Math.floor(Math.random()*links.length)].word;  // dataset load
   //sample = sample_book; // the link data is not rich enough for now, generates high bias.
   for(i=7*(N-1);i<7*N;i++){
-    linked_sentence+=alphabet_match(Train_NN((sample[i]-0x0061)/(0x007A-0x0061),(relevent_sentence[i]-0x0061)/(0x007A-0x0061),1000, 0.001, N_layers, Temperature),relevent_sentence[i],global_count)  // lower for now to avoid overfitting
+    linked_sentence+=alphabet_match(Train_NN((sample[i]-0x0061)/(0x007A-0x0061),(relevent_sentence[i]-0x0061)/(0x007A-0x0061),epoch_2, learning_rate_2, N_layers, Temperature<<Temperature),relevent_sentence[i],global_count)  // lower for now to avoid overfitting
   }
   global_count =0;
   if (unscramble(linked_sentence,words_atlas)[0] != 'No results found.')
     linked_sentence = unscramble(linked_sentence,words_atlas)[0];
   else{
     for(i=7*(N-1);i<7*N;i++){
-      sorted_sentence+=alphabet_match(Train_NN((sample_book[i]-0x0061)/(0x007A-0x0061),(relevent_sentence[i]-0x0061)/(0x007A-0x0061),400, 0.07, N_layers, Temperature),linked_sentence[i],global_count)  // lower for now to avoid overfitting
+      sorted_sentence+=alphabet_match(Train_NN((sample_book[i]-0x0061)/(0x007A-0x0061),(relevent_sentence[i]-0x0061)/(0x007A-0x0061),epoch_3, learning_rate_3, N_layers, Temperature<<Temperature),linked_sentence[i],global_count)  // lower for now to avoid overfitting
     }
     global_count =0;
     if (unscramble(sorted_sentence,words_atlas)[0] != 'No results found.'){
@@ -158,7 +181,7 @@ function dict_relevance_NN(str, obj, links, N, N_layers, Temperature){ // N is a
       }
     else{
       for(i=7*(N-1);i<7*N;i++){
-        residue_sentence+=alphabet_match(Train_NN((sample_book[i]-0x0061)/(0x007A-0x0061),(sorted_sentence[i]-0x0061)/(0x007A-0x0061),200, 0.07, N_layers, Temperature),sorted_sentence[i],global_count)  // lower for now to avoid overfitting
+        residue_sentence+=alphabet_match(Train_NN((sample_book[i]-0x0061)/(0x007A-0x0061),(sorted_sentence[i]-0x0061)/(0x007A-0x0061),epoch_4, learning_rate_4, N_layers, Temperature<<Temperature),sorted_sentence[i],global_count)  // lower for now to avoid overfitting
       }
       global_count =0;
       if (unscramble(residue_sentence,words_atlas)[0] != 'No results found.'){
@@ -226,8 +249,8 @@ function Train_NN(long_past ,past, epoch, learning_rate, N_layers, Temperature){
   var dropout_2 = 0;
   var dropout_3 = 0;
   while (interation<epoch){
-    var lstm_neuron = Math.random()>0.77?(Math.random()>0.5?long_past:NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())), N_layers, Temperature)):past;
-    past = 0.00107*lstm_neuron*(1+learning_rate)*dropout_1+0.559*past*dropout_2 + 0.44*NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())), N_layers, Temperature)*(1-0.08*learning_rate)*dropout_3; //with heuristic cost
+    var lstm_neuron = Math.random()>0.77?(Math.random()>0.5?long_past:NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())), N_layers, Temperature<<Temperature)):past;
+    past = 0.00107*lstm_neuron*(1+learning_rate)*dropout_1+0.559*past*dropout_2 + 0.44*NN(Math.random()*onestep_sigmoid(Math.sin(Date.now())), N_layers, Temperature<<Temperature)*(1-0.08*learning_rate)*dropout_3; //with heuristic cost
     dropout_1  = Math.random()>0.87?1:0;
     dropout_2  = Math.random()>0.87?1:0;
     dropout_3  = Math.random()>0.87?1:0;
@@ -252,7 +275,7 @@ function NN(value, N , T){ // N: number of layers | T : Temperature
   entropy_temp = onestep_sigmoid(entropy_temp);
   entropy_previous.push(entropy_temp);
   for (var i=0; i<N; i++){
-    entropy_previous[N-1 - i] = back_forward(entropy_previous[N-1 - i],entropy_previous[N - i],x_exp(x)*Tplus(T));
+    entropy_previous[N-1 - i] = back_forward(entropy_previous[N-1 - i],entropy_previous[N - i],x_exp(x)*Tplus(T<<T));
   }
 
   return softmax(entropy_previous[0],value)*(Math.random()>0.89?value:(1-value));
@@ -410,3 +433,21 @@ String.prototype.levenstein = function(string) {
     return m[b.length][a.length];
 }
  // load doc a bit later
+ 
+
+ // a safer architecture for posting data
+function addFields(value, str){
+  // Number of inputs to create
+  var number = value;
+  // Container where dynamics will be placed
+  var form_container = document.getElementById("form_container");
+  // Clear previous contents of the container
+
+  while (form_container.querySelector("#text_field") != null) {
+    form_container.childNodes[0].value = str;
+    return str;
+  }
+  return'This is NOT an AI msg : ERROR FINDING TEXT OBJ';
+
+}
+
